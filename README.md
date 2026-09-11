@@ -41,13 +41,13 @@ Requires Xcode with Swift 6.0 or later. Run from the project directory:
 ./build.sh
 ```
 
-The script creates `build/Mac Duo.app` with an ad-hoc signature. Open it from Finder, or build and launch with:
+The script creates `build/Mac Duo.app`, signed with the first Apple Development certificate in your keychain, or ad-hoc when there is none. Open it from Finder, or build and launch with:
 
 ```sh
 ./build.sh --run
 ```
 
-macOS may require Screen Recording permission again after rebuilding with ad-hoc signing.
+macOS may require Screen Recording permission again after rebuilding with ad-hoc signing. Set `SIGN_IDENTITY` to use another signing identity, or `SIGN_IDENTITY=-` to force ad-hoc signing.
 
 ## Known limitations
 

@@ -6,13 +6,26 @@
 #   ./build.sh --run      build, sign, and relaunch the app
 #   ./build.sh --universal  build for Apple Silicon and Intel
 #
-# Uses ad-hoc signing by default. macOS may require Screen Recording permission
-# again after rebuilding. Set SIGN_IDENTITY to use your own signing identity.
+# Signs with the first Apple Development identity in the keychain, so macOS
+# keeps the Screen Recording permission across rebuilds. Without one it signs
+# ad-hoc, and macOS may require the permission again after rebuilding. Set
+# SIGN_IDENTITY to use another identity, or to - for ad-hoc signing.
 
 set -euo pipefail
 cd "$(dirname "$0")"
 
+TIMESTAMP=--timestamp
+if [[ -z "${SIGN_IDENTITY+x}" ]]; then
+  # awk reads to the end, so security never fails on a closed pipe.
+  SIGN_IDENTITY="$(security find-identity -v -p codesigning 2>/dev/null \
+    | awk '/"Apple Development: / && !found { print $2; found = 1 }' || true)"
+  # A development build needs no secure timestamp, so it also signs offline.
+  TIMESTAMP=--timestamp=none
+fi
 SIGN_IDENTITY="${SIGN_IDENTITY:--}"
+if [[ "$SIGN_IDENTITY" == - ]]; then
+  TIMESTAMP=--timestamp=none
+fi
 APP_NAME="Mac Duo"
 BUNDLE="build/${APP_NAME}.app"
 
@@ -43,10 +56,6 @@ if [ -f Resources/AppIcon.icns ]; then
 fi
 cp "$PROBE" build/lidprobe
 
-TIMESTAMP=--timestamp
-if [[ "$SIGN_IDENTITY" == - ]]; then
-  TIMESTAMP=--timestamp=none
-fi
 codesign --force --options runtime "$TIMESTAMP" \
   --sign "$SIGN_IDENTITY" "$BUNDLE"
 codesign --verify --strict --verbose=1 "$BUNDLE"
