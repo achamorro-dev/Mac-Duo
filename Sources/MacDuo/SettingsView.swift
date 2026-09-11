@@ -36,7 +36,6 @@ struct SettingsView: View {
                         }
                         startGroup
                         lookGroup
-                        perspectiveGroup
                     }
                     .padding(.horizontal, Self.inset)
                     .padding(.vertical, 10)
@@ -83,7 +82,7 @@ struct SettingsView: View {
             toggleRow(
                 "Depth effect",
                 isOn: $preferences.isEnabled,
-                help: "Leans the screen away as the lid closes."
+                help: "Blurs and dims the screen as the lid closes."
             )
             toggleRow(
                 "Live rendering",
@@ -124,19 +123,6 @@ struct SettingsView: View {
             slider(
                 "Dimming spread", value: $preferences.dimReach, in: 0.2...1, format: "%.0f%%", scale: 100,
                 help: "Everything above this height goes fully dark."
-            )
-        }
-    }
-
-    private var perspectiveGroup: some View {
-        group("Perspective") {
-            slider(
-                "Lean back", value: $preferences.recession, in: 0...3, format: "%.1f×",
-                help: "Degrees of lean per degree of closing. 1 holds it still."
-            )
-            slider(
-                "Perspective", value: perspective, in: 0...1, format: "%.0f%%", scale: 100,
-                help: "0 keeps the sides parallel, 100 converges sharply."
             )
         }
     }
@@ -190,13 +176,6 @@ struct SettingsView: View {
                 .foregroundStyle(.tertiary)
                 .fixedSize(horizontal: false, vertical: true)
         }
-    }
-
-    private var perspective: Binding<Double> {
-        Binding(
-            get: { (Preferences.farthestEye - preferences.viewingDistance) / Preferences.eyeRange },
-            set: { preferences.viewingDistance = Preferences.farthestEye - $0 * Preferences.eyeRange }
-        )
     }
 
     private var permissionNotice: some View {

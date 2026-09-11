@@ -2,9 +2,9 @@ import Foundation
 
 /// The whole effect in one fragment shader.
 ///
-/// Each screen pixel maps back into the picture through the inverse
-/// perspective, then takes one sample from a Gaussian pyramid at a level
-/// chosen by the blur wanted there. The texture already holds the picture on
+/// Each screen pixel takes one sample from a Gaussian pyramid at a level
+/// chosen by the blur wanted there. The picture stays put on the glass, so a
+/// screen point is a picture point. The texture already holds the picture on
 /// black, so the two blur together and the picture edge needs no special
 /// handling.
 enum DepthShaders {
@@ -14,9 +14,6 @@ enum DepthShaders {
 
     // All float4, so the layout cannot drift from the Swift side.
     struct Uniforms {
-        float4 column0;          // screen-to-picture matrix, column 0 in xyz
-        float4 column1;
-        float4 column2;
         float4 screenAndOrigin;  // screen size, padded origin in picture points
         float4 paddedAndBlur;    // padded size, max radius in pixels, blur strength
         float4 shape;            // blur floor, max dim, pixel scale, max level
@@ -46,22 +43,12 @@ enum DepthShaders {
         float dimStrength = uniforms.light.y;
         float dimReach = uniforms.light.z;
 
-        // Fragment coordinates are pixels with y down; the geometry is points
+        // Fragment coordinates are pixels with y down; the picture is points
         // with y up.
-        float2 screenPoint = float2(position.x / pixelScale,
-                                    screenSize.y - position.y / pixelScale);
-
-        float3x3 screenToPicture = float3x3(uniforms.column0.xyz,
-                                            uniforms.column1.xyz,
-                                            uniforms.column2.xyz);
-        float3 mapped = screenToPicture * float3(screenPoint, 1.0);
-        if (abs(mapped.z) < 1e-6) { return float4(0.0, 0.0, 0.0, 1.0); }
-        float2 picturePoint = mapped.xy / mapped.z;
+        float2 picturePoint = float2(position.x / pixelScale,
+                                     screenSize.y - position.y / pixelScale);
 
         float2 unit = (picturePoint - paddedOrigin) / paddedSize;
-        if (unit.x < 0.0 || unit.x > 1.0 || unit.y < 0.0 || unit.y > 1.0) {
-            return float4(0.0, 0.0, 0.0, 1.0);
-        }
         float2 texCoord = float2(unit.x, 1.0 - unit.y);
 
         float height = clamp(picturePoint.y / screenSize.y, 0.0, 1.0);

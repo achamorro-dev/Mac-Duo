@@ -16,9 +16,6 @@ final class DepthRenderer {
     nonisolated private static let paddingInPoints: CGFloat = 120
 
     private struct Uniforms {
-        var column0: SIMD4<Float>
-        var column1: SIMD4<Float>
-        var column2: SIMD4<Float>
         var screenAndOrigin: SIMD4<Float>
         var paddedAndBlur: SIMD4<Float>
         var shape: SIMD4<Float>
@@ -397,10 +394,7 @@ final class DepthRenderer {
         texture = nil
     }
 
-    /// - Parameter corners: the picture corners projected onto the screen, in
-    ///   points, listed bottom-left, bottom-right, top-right, top-left.
     func render(
-        corners: [CGPoint],
         blurStrength: Double,
         dimStrength: Double,
         hingeFloor: Double,
@@ -417,21 +411,7 @@ final class DepthRenderer {
             return
         }
 
-        let forward = Homography.matrix(
-            width: Double(screenSize.width),
-            height: Double(screenSize.height),
-            to: corners.map { SIMD2(Double($0.x), Double($0.y)) }
-        )
-        let inverse = forward.inverse
-
-        func column(_ index: Int) -> SIMD4<Float> {
-            let c = inverse[index]
-            return SIMD4(Float(c.x), Float(c.y), Float(c.z), 0)
-        }
         var uniforms = Uniforms(
-            column0: column(0),
-            column1: column(1),
-            column2: column(2),
             screenAndOrigin: SIMD4(
                 Float(screenSize.width), Float(screenSize.height),
                 Float(paddedOrigin.x), Float(paddedOrigin.y)

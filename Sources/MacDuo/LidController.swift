@@ -340,7 +340,6 @@ final class LidController: ObservableObject {
         if preferences.isLivePicture, let screen = NSScreen.builtIn,
            overlay.showLive(
                on: screen,
-               startAngle: preferences.thresholdAngle,
                tuning: tuning,
                fadeIn: Self.fadeInDuration
            ) {
@@ -410,7 +409,6 @@ final class LidController: ObservableObject {
         overlay.show(
             image: image,
             on: screen,
-            startAngle: preferences.thresholdAngle,
             tuning: tuning,
             fadeIn: Self.fadeInDuration
         )
@@ -455,16 +453,13 @@ final class LidController: ObservableObject {
         applyVisual(angle: visualAngle.value)
     }
 
-    /// The geometry takes the lid angle itself, so only the blur saturates.
     private func applyVisual(angle: Double) {
         let progress = blurProgress(for: angle)
-        overlay.update(progress: progress, currentAngle: angle, tuning: tuning)
+        overlay.update(progress: progress, tuning: tuning)
     }
 
     private var tuning: DepthTuning {
         DepthTuning(
-            viewingDistance: preferences.viewingDistance,
-            recession: preferences.recession,
             blurEvenness: preferences.blurEvenness,
             dimReach: preferences.dimReach,
             maxBlurRadius: preferences.maxBlurRadius,

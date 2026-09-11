@@ -12,8 +12,6 @@ final class Preferences: ObservableObject {
         static let blurSpan = "blurSpan"
         static let maxBlurRadius = "maxBlurRadius"
         static let maxDim = "maxDim"
-        static let viewingDistance = "viewingDistance"
-        static let recession = "recession"
         static let blurEvenness = "blurEvenness"
         static let dimReach = "dimReach"
         static let showsAngleInMenuBar = "showsAngleInMenuBar"
@@ -21,7 +19,7 @@ final class Preferences: ObservableObject {
 
         static let all = [
             isEnabled, thresholdAngle, blurSpan, maxBlurRadius,
-            maxDim, viewingDistance, recession, blurEvenness, dimReach,
+            maxDim, blurEvenness, dimReach,
             showsAngleInMenuBar, isLivePicture,
         ]
     }
@@ -32,8 +30,6 @@ final class Preferences: ObservableObject {
         Key.blurSpan: 60.0,
         Key.maxBlurRadius: 135.0,
         Key.maxDim: 1.0,
-        Key.viewingDistance: 6.0,
-        Key.recession: 1.0,
         Key.blurEvenness: 0.0,
         Key.dimReach: 0.5,
         Key.showsAngleInMenuBar: false,
@@ -65,18 +61,6 @@ final class Preferences: ObservableObject {
         didSet { defaults.set(maxDim, forKey: Key.maxDim) }
     }
 
-    /// Distance from the eye to the middle of the screen, as a multiple of
-    /// the screen height.
-    @Published var viewingDistance: Double {
-        didSet { defaults.set(viewingDistance, forKey: Key.viewingDistance) }
-    }
-
-    /// Degrees the picture turns away from the glass for each degree the lid
-    /// closes. One holds the picture still in the room.
-    @Published var recession: Double {
-        didSet { defaults.set(recession, forKey: Key.recession) }
-    }
-
     /// Blur at the hinge edge as a fraction of the blur at the far edge. One
     /// blurs the whole picture by the same amount.
     @Published var blurEvenness: Double {
@@ -100,12 +84,6 @@ final class Preferences: ObservableObject {
         didSet { defaults.set(isLivePicture, forKey: Key.isLivePicture) }
     }
 
-    /// Eye distance in screen heights, at the two ends of the perspective
-    /// slider. The panel offers the strength, which runs the other way.
-    static let farthestEye: Double = 6
-    static let nearestEye: Double = 1
-    static let eyeRange: Double = farthestEye - nearestEye
-
     /// Highest angle above the threshold at which the pre-warm may run.
     let prewarmCeiling: Double = 70
 
@@ -124,6 +102,7 @@ final class Preferences: ObservableObject {
     /// Settings from earlier versions, removed at launch.
     private static let retired = [
         "blurFrontWidth", "maxTilt", "tiltDegrees", "tiltRatio", "dimEvenness",
+        "viewingDistance", "recession",
     ]
 
     private let defaults = UserDefaults.standard
@@ -139,8 +118,6 @@ final class Preferences: ObservableObject {
         blurSpan = defaults.double(forKey: Key.blurSpan)
         maxBlurRadius = defaults.double(forKey: Key.maxBlurRadius)
         maxDim = defaults.double(forKey: Key.maxDim)
-        viewingDistance = defaults.double(forKey: Key.viewingDistance)
-        recession = defaults.double(forKey: Key.recession)
         blurEvenness = defaults.double(forKey: Key.blurEvenness)
         dimReach = defaults.double(forKey: Key.dimReach)
         showsAngleInMenuBar = defaults.bool(forKey: Key.showsAngleInMenuBar)
@@ -156,8 +133,6 @@ final class Preferences: ObservableObject {
         blurSpan = defaults.double(forKey: Key.blurSpan)
         maxBlurRadius = defaults.double(forKey: Key.maxBlurRadius)
         maxDim = defaults.double(forKey: Key.maxDim)
-        viewingDistance = defaults.double(forKey: Key.viewingDistance)
-        recession = defaults.double(forKey: Key.recession)
         blurEvenness = defaults.double(forKey: Key.blurEvenness)
         dimReach = defaults.double(forKey: Key.dimReach)
         showsAngleInMenuBar = defaults.bool(forKey: Key.showsAngleInMenuBar)
